@@ -33,6 +33,7 @@ def show_new_form():
 def save_form_info():
     title = request.form.get("title")
     text  = request.form.get("text")
+    text  = text.replace("\n", "<br>")
 
     if title and text:
         article = Article(title = title, text = text)
