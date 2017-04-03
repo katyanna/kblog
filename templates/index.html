@@ -4,7 +4,7 @@
 
 {% for article in articles %}
   <div class="article">
-    <h2 class="article-title">{{ article.title }}</h2>
+    <h2 class="article-title"><a href="/{{ article.key().id() }}">{{ article.title }}</a></h2>
     <p class="article-text">{{ article.text}}</p>
   </div>
 
