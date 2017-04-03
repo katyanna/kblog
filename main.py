@@ -5,6 +5,11 @@ import pdb
 
 app = Flask(__name__)
 
+@app.errorhandler(404)
+def page_not_found(e):
+    """Return a custom 404 error."""
+    return 'Sorry, nothing at this URL.', 404
+
 @app.route('/new', methods=['GET', 'POST'])
 def get_or_post():
     if request.method == 'GET':
@@ -17,6 +22,11 @@ def home():
     articles = db.GqlQuery("select * from Article order by created desc")
     return render_template("index.html", articles = articles)
 
+@app.route('/<article_id>')
+def show_article(article_id):
+    article = Article.get_by_id(int(article_id))
+    return render_template("show.html", article = article)
+
 def show_new_form():
     return render_template("new.html")
 
@@ -25,18 +35,15 @@ def save_form_info():
     text  = request.form.get("text")
 
     if title and text:
-        a = Article(title = title, text = text)
-        a.put()
+        article = Article(title = title, text = text)
+        article.put()
 
-        return redirect(url_for('home'))
+        article_id = str(article.key().id())
+
+        return redirect(url_for('show_article', article_id = article_id))
     else:
         error = "Oh, oh! We need title and text, baby ;)"
         return render_template("new.html", title = title, text = text, error = error)
-
-@app.errorhandler(404)
-def page_not_found(e):
-    """Return a custom 404 error."""
-    return 'Sorry, nothing at this URL.', 404
 
 class Article(db.Model):
     title   = db.StringProperty(required = True)
