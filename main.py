@@ -22,9 +22,9 @@ def home():
     articles = db.GqlQuery("select * from Article order by created desc")
     return render_template("index.html", articles = articles)
 
-@app.route('/<article_id>')
+@app.route('/<int:article_id>')
 def show_article(article_id):
-    article = Article.get_by_id(int(article_id))
+    article = Article.get_by_id(article_id)
     return render_template("show.html", article = article)
 
 def show_new_form():
