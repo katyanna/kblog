@@ -1,10 +1,13 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, make_response
 from google.appengine.ext import db
 import jinja2
 import re
+import hmac
 import pdb
 
 app = Flask(__name__)
+
+SECRET = 'li0q387ytp2i54uyjhgo8f7'
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -18,6 +21,15 @@ def page_not_found(e):
 def home():
     articles = db.GqlQuery("select * from Article order by created desc")
     return render_template("index.html", articles = articles)
+
+def make_secure_value(val):
+    hash_str = hmac.new(SECRET, val).hexdigest()
+    return "%s|%s" % (val, hash_str)
+
+def check_secure_value(secure_val):
+    val = secure_val.split('|')[0]
+    if secure_val == make_secure_value(val):
+        return val
 
 #
 # Sign Up
@@ -72,7 +84,34 @@ def save_signup_info():
     if have_error:
         return render_template("signup.html", **params)
     else:
-        return render_template("welcome.html", username = username)
+        user = User(username = username, password = password, email = email)
+        user.put()
+
+        resp = make_response(redirect(url_for('welcome')))
+        resp.set_cookie('user_id', make_secure_value(str(user.key().id())))
+
+        return resp
+
+@app.route('/welcome')
+def welcome():
+    user_cookie = request.cookies.get('user_id')
+
+    if user_cookie:
+        user_id = user_cookie.split('|')[0]
+        user = User.get_by_id(int(user_id))
+
+        if check_secure_value(user_cookie):
+            return render_template("welcome.html", username = user.username)
+        else:
+            return redirect(url_for('signup'))
+
+#
+# User
+#
+class User(db.Model):
+    username = db.StringProperty(required = True)
+    password = db.StringProperty(required = True)
+    email    = db.StringProperty(required = False)
 
 #
 # Post
