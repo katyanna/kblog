@@ -12,15 +12,9 @@ header {
   background-color: #fff9f9;
 }
 
-.site-title {
-  margin: 0;
-  padding: 5em 0;
-}
-
 h1 {
   color: #FE4365;
   margin: 0 auto;
-  text-align: center;
   font-weight: 300;
   font-size: 3em;
 }
@@ -28,6 +22,34 @@ h1 {
 h2 {
   color: #FE4365;
   font-weight: 300;
+}
+
+.wrapper{
+  max-width: 60em;
+  margin: 0 auto;
+}
+
+
+.site-title {
+  letter-spacing: 3px;
+  float: left;
+  margin-top: 5px;
+}
+
+.home-nav {
+  line-height: 60px;
+}
+
+.home-nav ul {
+  float: right;
+  margin: 0;
+  list-style: none;
+}
+
+.home-nav ul li {
+  display: inline;
+  padding: 0 15px;
+  font-size: 1.3em;
 }
 
 /*
